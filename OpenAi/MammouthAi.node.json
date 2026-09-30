@@ -1,5 +1,5 @@
 {
-	"node": "n8n-nodes-base.mammouthai",
+	"node": "n8n-nodes-mammouth.mammouth",
 	"nodeVersion": "1.0",
 	"codexVersion": "1.0",
 	"categories": ["Utility"],

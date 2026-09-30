@@ -22,7 +22,7 @@ export const chatOperations: INodeProperties[] = [
 				routing: {
 					request: {
 						method: 'POST',
-						url: '/v1/chat/completions',
+						url: '/chat/completions',
 					},
 					output: { postReceive: [sendErrorPostReceive] },
 				},
@@ -38,7 +38,7 @@ const completeOperations: INodeProperties[] = [
 		name: 'model',
 		type: 'options',
 		description:
-			'The model which will generate the completion. <a href="https://beta.openai.com/docs/models/overview">Learn more</a>.',
+			'The model available on your Mammouth API which will generate the completion',
 		displayOptions: {
 			show: {
 				operation: ['complete'],
@@ -51,7 +51,7 @@ const completeOperations: INodeProperties[] = [
 				routing: {
 					request: {
 						method: 'GET',
-						url: '/v1/models',
+						url: '/models',
 					},
 					output: {
 						postReceive: [
@@ -59,12 +59,6 @@ const completeOperations: INodeProperties[] = [
 								type: 'rootProperty',
 								properties: {
 									property: 'data',
-								},
-							},
-							{
-								type: 'filter',
-								properties: {
-									pass: "={{ $responseItem.id.startsWith('gpt-') && !$responseItem.id.startsWith('gpt-4-vision') }}",
 								},
 							},
 							{
@@ -91,14 +85,15 @@ const completeOperations: INodeProperties[] = [
 				property: 'model',
 			},
 		},
-		default: 'gpt-3.5-turbo',
+		required: true,
+		default: '',
 	},
 	{
 		displayName: 'Model',
 		name: 'chatModel',
 		type: 'options',
 		description:
-			'The model which will generate the completion. <a href="https://beta.openai.com/docs/models/overview">Learn more</a>.',
+			'The model available on your Mammouth API which will generate the completion',
 		displayOptions: {
 			show: {
 				operation: ['complete'],
@@ -113,7 +108,7 @@ const completeOperations: INodeProperties[] = [
 				routing: {
 					request: {
 						method: 'GET',
-						url: '/v1/models',
+						url: '/models',
 					},
 					output: {
 						postReceive: [
@@ -121,12 +116,6 @@ const completeOperations: INodeProperties[] = [
 								type: 'rootProperty',
 								properties: {
 									property: 'data',
-								},
-							},
-							{
-								type: 'filter',
-								properties: {
-									pass: "={{ $responseItem.id.startsWith('gpt-') && !$responseItem.id.startsWith('gpt-4-vision') }}",
 								},
 							},
 							{
@@ -153,7 +142,8 @@ const completeOperations: INodeProperties[] = [
 				property: 'model',
 			},
 		},
-		default: 'gpt-3.5-turbo',
+		required: true,
+		default: '',
 	},
 	{
 		displayName: 'Prompt',

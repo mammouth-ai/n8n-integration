@@ -22,7 +22,7 @@ export const imageOperations: INodeProperties[] = [
 				routing: {
 					request: {
 						method: 'POST',
-						url: '/v1/images/generations',
+						url: '/images/generations',
 					},
 					output: { postReceive: [sendErrorPostReceive] },
 				},
@@ -70,14 +70,15 @@ const createOperations: INodeProperties[] = [
 		displayName: 'Model',
 		name: 'model',
 		type: 'options',
-		default: 'dall-e-2',
+		required: true,
+		default: '',
 		description: 'The model to use for image generation',
 		typeOptions: {
 			loadOptions: {
 				routing: {
 					request: {
 						method: 'GET',
-						url: '/v1/models',
+						url: '/models',
 					},
 					output: {
 						postReceive: [
@@ -85,12 +86,6 @@ const createOperations: INodeProperties[] = [
 								type: 'rootProperty',
 								properties: {
 									property: 'data',
-								},
-							},
-							{
-								type: 'filter',
-								properties: {
-									pass: "={{ $responseItem.id.startsWith('dall-') }}",
 								},
 							},
 							{
@@ -129,14 +124,15 @@ const createOperations: INodeProperties[] = [
 		displayName: 'Model',
 		name: 'imageModel',
 		type: 'options',
-		default: 'dall-e-2',
+		required: true,
+		default: '',
 		description: 'The model to use for image generation',
 		typeOptions: {
 			loadOptions: {
 				routing: {
 					request: {
 						method: 'GET',
-						url: '/v1/models',
+						url: '/models',
 					},
 					output: {
 						postReceive: [
@@ -144,12 +140,6 @@ const createOperations: INodeProperties[] = [
 								type: 'rootProperty',
 								properties: {
 									property: 'data',
-								},
-							},
-							{
-								type: 'filter',
-								properties: {
-									pass: "={{ $responseItem.id.startsWith('dall-') }}",
 								},
 							},
 							{

@@ -22,7 +22,7 @@ export const textOperations: INodeProperties[] = [
 				routing: {
 					request: {
 						method: 'POST',
-						url: '/v1/completions',
+						url: '/completions',
 					},
 					output: { postReceive: [sendErrorPostReceive] },
 				},
@@ -35,7 +35,7 @@ export const textOperations: INodeProperties[] = [
 				routing: {
 					request: {
 						method: 'POST',
-						url: '/v1/edits',
+						url: '/edits',
 					},
 					output: { postReceive: [sendErrorPostReceive] },
 				},
@@ -44,11 +44,11 @@ export const textOperations: INodeProperties[] = [
 				name: 'Moderate',
 				value: 'moderate',
 				action: 'Create a Moderation',
-				description: "Classify if a text violates OpenAI's content policy",
+				description: 'Classify text using the moderation policy of your Mammouth API',
 				routing: {
 					request: {
 						method: 'POST',
-						url: '/v1/moderations',
+						url: '/moderations',
 					},
 					output: { postReceive: [sendErrorPostReceive] },
 				},
@@ -64,7 +64,7 @@ const completeOperations: INodeProperties[] = [
 		name: 'model',
 		type: 'options',
 		description:
-			'The model which will generate the completion. <a href="https://beta.openai.com/docs/models/overview">Learn more</a>.',
+			'The model available on your Mammouth API which will generate the completion',
 		displayOptions: {
 			show: {
 				operation: ['complete'],
@@ -76,7 +76,7 @@ const completeOperations: INodeProperties[] = [
 				routing: {
 					request: {
 						method: 'GET',
-						url: '/v1/models',
+						url: '/models',
 					},
 					output: {
 						postReceive: [
@@ -84,12 +84,6 @@ const completeOperations: INodeProperties[] = [
 								type: 'rootProperty',
 								properties: {
 									property: 'data',
-								},
-							},
-							{
-								type: 'filter',
-								properties: {
-									pass: "={{ !$responseItem.id.startsWith('audio-') && ($responseItem.id === 'gpt-3.5-turbo-instruct' || !$responseItem.id.startsWith('gpt-') ) && !$responseItem.id.startsWith('dall-') && !$responseItem.id.startsWith('tts-') && !$responseItem.id.startsWith('whisper-') && !['cushman:2020-05-03', 'davinci-if:3.0.0', 'davinci-instruct-beta:2.0.0', 'if'].includes($responseItem.id) && !$responseItem.id.includes('-edit-') && !$responseItem.id.endsWith(':001') }}",
 								},
 							},
 							{
@@ -116,7 +110,8 @@ const completeOperations: INodeProperties[] = [
 				property: 'model',
 			},
 		},
-		default: 'gpt-3.5-turbo-instruct',
+		required: true,
+		default: '',
 	},
 	{
 		displayName: 'Prompt',
@@ -147,32 +142,23 @@ const editOperations: INodeProperties[] = [
 	{
 		displayName: 'Model',
 		name: 'model',
-		type: 'options',
+		type: 'string',
+		required: true,
 		description:
-			'The model which will generate the edited version. <a href="https://beta.openai.com/docs/models/overview">Learn more</a>.',
+			'ID of a model on your Mammouth API that supports text editing',
 		displayOptions: {
 			show: {
 				operation: ['edit'],
 				resource: ['text'],
 			},
 		},
-		options: [
-			{
-				name: 'code-davinci-edit-001',
-				value: 'code-davinci-edit-001',
-			},
-			{
-				name: 'text-davinci-edit-001',
-				value: 'text-davinci-edit-001',
-			},
-		],
 		routing: {
 			send: {
 				type: 'body',
 				property: 'model',
 			},
 		},
-		default: 'text-davinci-edit-001',
+		default: '',
 	},
 	{
 		displayName: 'Input',
@@ -220,32 +206,23 @@ const moderateOperations: INodeProperties[] = [
 	{
 		displayName: 'Model',
 		name: 'model',
-		type: 'options',
+		type: 'string',
+		required: true,
 		description:
-			'The model which will classify the text. <a href="https://beta.openai.com/docs/models/overview">Learn more</a>.',
+			'ID of a model on your Mammouth API that supports text moderation',
 		displayOptions: {
 			show: {
 				resource: ['text'],
 				operation: ['moderate'],
 			},
 		},
-		options: [
-			{
-				name: 'text-moderation-stable',
-				value: 'text-moderation-stable',
-			},
-			{
-				name: 'text-moderation-latest',
-				value: 'text-moderation-latest',
-			},
-		],
 		routing: {
 			send: {
 				type: 'body',
 				property: 'model',
 			},
 		},
-		default: 'text-moderation-latest',
+		default: '',
 	},
 	{
 		displayName: 'Input',
