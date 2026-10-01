@@ -16,11 +16,11 @@
 		"credentials": ["dist/MammouthApi.credentials.js"],
 		"nodes": ["dist/MammouthAi.node.js"]
 	},
-	"engines": { "node": ">=22" },
-	"peerDependencies": { "n8n-workflow": "^2.16.0" },
+	"engines": { "node": ">=24" },
+	"peerDependencies": { "n8n-workflow": "^2.42.1" },
 	"devDependencies": {
 		"@types/node": "22.20.4",
-		"n8n-workflow": "2.16.0",
+		"n8n-workflow": "2.42.1",
 		"typescript": "5.9.3"
 	}
 }

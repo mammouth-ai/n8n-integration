@@ -9,7 +9,7 @@ export class MammouthAi implements INodeType {
 	description: INodeTypeDescription = {
 		displayName: 'Mammouth',
 		name: 'mammouth',
-		icon: { light: 'file:mammouth.svg', dark: 'file:mammouth.dark.svg' },
+		icon: { light: 'file:icons/mammouth.svg', dark: 'file:icons/mammouth.dark.svg' },
 		group: ['transform'],
 		version: [1, 1.1],
 		subtitle: '={{$parameter["operation"] + ": " + $parameter["resource"]}}',

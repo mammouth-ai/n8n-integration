@@ -2,12 +2,14 @@ import type {
 	IAuthenticateGeneric,
 	ICredentialTestRequest,
 	ICredentialType,
+	Icon,
 	INodeProperties,
 } from 'n8n-workflow';
 
 export class MammouthApi implements ICredentialType {
 	name = 'mammouthApi';
 	displayName = 'Mammouth API';
+	icon: Icon = { light: 'file:icons/mammouth.svg', dark: 'file:icons/mammouth.dark.svg' };
 
 	properties: INodeProperties[] = [
 		{

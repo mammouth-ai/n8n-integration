@@ -9,6 +9,11 @@ execFileSync(process.execPath, [require.resolve('typescript/bin/tsc'), '-p', roo
 	stdio: 'inherit',
 });
 mkdirSync(dist, { recursive: true });
-for (const asset of ['MammouthAi.node.json', 'mammouth.svg', 'mammouth.dark.svg', '__schema__']) {
+for (const asset of ['MammouthAi.node.json', '__schema__']) {
 	cpSync(resolve(root, asset), resolve(dist, asset), { recursive: true });
+}
+// n8n's icon route requires a subdirectory between the package and filename.
+mkdirSync(resolve(dist, 'icons'), { recursive: true });
+for (const icon of ['mammouth.svg', 'mammouth.dark.svg']) {
+	cpSync(resolve(root, icon), resolve(dist, 'icons', icon));
 }
