@@ -1,26 +1,37 @@
 {
-	"name": "n8n-nodes-mammouth",
-	"version": "0.1.0",
-	"private": true,
-	"description": "Private Mammouth API node for n8n",
-	"license": "UNLICENSED",
-	"keywords": ["n8n-community-node-package"],
-	"files": ["dist"],
-	"scripts": {
-		"build": "node scripts/build.cjs",
-		"test": "npm run build && node --test tests/*.test.cjs",
-		"prepack": "npm run build"
-	},
-	"n8n": {
-		"n8nNodesApiVersion": 1,
-		"credentials": ["dist/MammouthApi.credentials.js"],
-		"nodes": ["dist/MammouthAi.node.js"]
-	},
-	"engines": { "node": ">=24" },
-	"peerDependencies": { "n8n-workflow": "^2.42.1" },
-	"devDependencies": {
-		"@types/node": "22.20.4",
-		"n8n-workflow": "2.42.1",
-		"typescript": "5.9.3"
-	}
+  "name": "n8n-nodes-mammouth",
+  "version": "0.1.1",
+  "description": "Mammouth API node for n8n",
+  "license": "MIT",
+  "keywords": [
+    "n8n-community-node-package"
+  ],
+  "files": [
+    "dist"
+  ],
+  "scripts": {
+    "build": "node scripts/build.cjs",
+    "test": "npm run build && node --test tests/*.test.cjs",
+    "prepack": "npm run build"
+  },
+  "n8n": {
+    "n8nNodesApiVersion": 1,
+    "credentials": [
+      "dist/MammouthApi.credentials.js"
+    ],
+    "nodes": [
+      "dist/MammouthAi.node.js"
+    ]
+  },
+  "engines": {
+    "node": ">=18.17.0"
+  },
+  "peerDependencies": {
+    "n8n-workflow": "*"
+  },
+  "devDependencies": {
+    "@types/node": "^22.0.0",
+    "n8n-workflow": "^2.42.1",
+    "typescript": "^5.0.0"
+  }
 }
