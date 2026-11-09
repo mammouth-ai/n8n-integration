@@ -1,6 +1,6 @@
 {
   "name": "n8n-nodes-mammouth",
-  "version": "0.1.1",
+  "version": "0.1.2",
   "description": "Mammouth API node for n8n",
   "license": "MIT",
   "keywords": [
@@ -20,7 +20,8 @@
       "dist/MammouthApi.credentials.js"
     ],
     "nodes": [
-      "dist/MammouthAi.node.js"
+      "dist/MammouthAi.node.js",
+      "dist/LmChatMammouth.node.js"
     ]
   },
   "engines": {
@@ -33,5 +34,9 @@
     "@types/node": "^22.0.0",
     "n8n-workflow": "^2.42.1",
     "typescript": "^5.0.0"
+  },
+  "dependencies": {
+    "@langchain/core": "1.2.0",
+    "@langchain/openai": "1.4.4"
   }
 }
