@@ -13,7 +13,7 @@ export class MammouthAi implements INodeType {
 		group: ['transform'],
 		version: [1, 1.1],
 		subtitle: '={{$parameter["operation"] + ": " + $parameter["resource"]}}',
-		description: 'Generate chat, text and images with the Mammouth API',
+		description: 'Chat, generate text and create or analyze images with Mammouth AI (https://mammouth.ai)',
 		defaults: {
 			name: 'Mammouth',
 		},
@@ -35,18 +35,26 @@ export class MammouthAi implements INodeType {
 				name: 'resource',
 				type: 'options',
 				noDataExpression: true,
+				description:
+					'What you want to work with. Get your API key on <a href="https://mammouth.ai" target="_blank">mammouth.ai</a>.',
 				options: [
 					{
-						name: 'Chat',
+						name: 'Chat (Recommended for Text Generation)',
 						value: 'chat',
+						description:
+							'Ask a question or give an instruction and get a written answer: write an email, summarize, translate, classify, extract data…',
 					},
 					{
 						name: 'Image',
 						value: 'image',
+						description:
+							'Generate a picture from a description, or let a model read and describe images (e.g. email attachments)',
 					},
 					{
-						name: 'Text',
+						name: 'Text (Advanced)',
 						value: 'text',
+						description:
+							'Older text tools: raw text continuation, instruction-based editing and unsafe content detection. For most text tasks, use Chat instead.',
 					},
 				],
 				default: 'chat',

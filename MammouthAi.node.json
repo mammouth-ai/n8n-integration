@@ -3,5 +3,8 @@
 	"nodeVersion": "1.0",
 	"codexVersion": "1.0",
 	"categories": ["Utility"],
-	"alias": ["Mammouth", "AI"]
+	"alias": ["Mammouth", "AI"],
+	"resources": {
+		"primaryDocumentation": [{ "url": "https://mammouth.ai" }]
+	}
 }

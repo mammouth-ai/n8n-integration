@@ -1,4 +1,10 @@
-import type { INodeExecutionData, INodeProperties } from 'n8n-workflow';
+import type {
+	IExecuteSingleFunctions,
+	IHttpRequestOptions,
+	INodeExecutionData,
+	INodeProperties,
+} from 'n8n-workflow';
+import { NodeOperationError } from 'n8n-workflow';
 
 import { sendErrorPostReceive } from './GenericFunctions';
 
@@ -15,43 +21,57 @@ export const imageOperations: INodeProperties[] = [
 		},
 		options: [
 			{
-				name: 'Create',
+				name: 'Generate Image',
 				value: 'create',
-				action: 'Create an Image',
-				description: 'Create an image for a given text',
+				action: 'Generate an image',
+				description:
+					'Create one or more new pictures from a text description (returned as a file or a URL)',
 				routing: {
 					request: {
 						method: 'POST',
 						url: '/images/generations',
 					},
-					output: { postReceive: [sendErrorPostReceive] },
+					output: {
+						postReceive: [
+							sendErrorPostReceive,
+							{
+								type: 'rootProperty',
+								properties: {
+									property: 'data',
+								},
+							},
+						],
+					},
+				},
+			},
+			{
+				name: 'Analyze Images',
+				value: 'analyze',
+				action: 'Analyze images with text',
+				description:
+					'Send a text (e.g. an email body) and one or more images in a single request, and get a written answer (description, summary, data extraction…)',
+				routing: {
+					request: {
+						method: 'POST',
+						url: '/chat/completions',
+					},
+					send: { preSend: [buildAnalyzeBody] },
+					output: { postReceive: [sendErrorPostReceive, simplifyAnalyzeOutput] },
 				},
 			},
 		],
-		routing: {
-			output: {
-				postReceive: [
-					{
-						type: 'rootProperty',
-						properties: {
-							property: 'data',
-						},
-					},
-				],
-			},
-		},
 		default: 'create',
 	},
 ];
 
 const createOperations: INodeProperties[] = [
 	{
-		displayName: 'Prompt',
+		displayName: 'Image Description',
 		name: 'prompt',
 		type: 'string',
 		placeholder: 'e.g. A cute cat eating a dinosaur',
 		description:
-			'A text description of the desired image(s). The maximum length is 1000 characters.',
+			'Describe the picture you want: subject, style, colors, framing. The maximum length is 1000 characters.',
 		displayOptions: {
 			show: {
 				resource: ['image'],
@@ -177,11 +197,12 @@ const createOperations: INodeProperties[] = [
 		},
 	},
 	{
-		displayName: 'Response Format',
+		displayName: 'Return Image As',
 		name: 'responseFormat',
 		type: 'options',
 		default: 'binaryData',
-		description: 'The format in which to return the image(s)',
+		description:
+			'File: ready to attach to an email or upload. URL: a temporary link to the image.',
 		displayOptions: {
 			show: {
 				resource: ['image'],
@@ -190,11 +211,11 @@ const createOperations: INodeProperties[] = [
 		},
 		options: [
 			{
-				name: 'Binary File',
+				name: 'File',
 				value: 'binaryData',
 			},
 			{
-				name: 'Image Url',
+				name: 'Image URL',
 				value: 'imageUrl',
 			},
 		],
@@ -381,9 +402,243 @@ const createOperations: INodeProperties[] = [
 	},
 ];
 
+async function buildAnalyzeBody(
+	this: IExecuteSingleFunctions,
+	requestOptions: IHttpRequestOptions,
+): Promise<IHttpRequestOptions> {
+	const inputType = this.getNodeParameter('inputType') as 'url' | 'binary' | 'allBinary' | 'none';
+	const options = this.getNodeParameter('analyzeOptions', {}) as {
+		detail?: string;
+		maxTokens?: number;
+		systemMessage?: string;
+	};
+
+	let urls: string[] = [];
+	if (inputType === 'allBinary') {
+		for (const [name, binary] of Object.entries(this.getInputData().binary ?? {})) {
+			// Email attachments may include PDFs, etc. — only images are sent to the vision model.
+			if (!binary.mimeType?.startsWith('image/')) continue;
+			const buffer = await this.helpers.getBinaryDataBuffer(name);
+			urls.push(`data:${binary.mimeType};base64,${buffer.toString('base64')}`);
+		}
+	} else if (inputType === 'binary') {
+		const names = (this.getNodeParameter('binaryPropertyName') as string)
+			.split(',')
+			.map((name) => name.trim())
+			.filter(Boolean);
+		for (const name of names) {
+			const { mimeType } = this.helpers.assertBinaryData(name);
+			const buffer = await this.helpers.getBinaryDataBuffer(name);
+			urls.push(`data:${mimeType};base64,${buffer.toString('base64')}`);
+		}
+	} else if (inputType === 'url') {
+		urls = (this.getNodeParameter('imageUrls') as string)
+			.split(',')
+			.map((url) => url.trim())
+			.filter(Boolean);
+	}
+
+	const text = this.getNodeParameter('text') as string;
+	if (urls.length === 0 && !text.trim()) {
+		throw new NodeOperationError(this.getNode(), 'Provide a text input or at least one image');
+	}
+
+	requestOptions.body = {
+		model: this.getNodeParameter('analyzeModel') as string,
+		messages: [
+			...(options.systemMessage ? [{ role: 'system', content: options.systemMessage }] : []),
+			{
+				role: 'user',
+				content: [
+					...(text.trim() ? [{ type: 'text', text }] : []),
+					...urls.map((url) => ({
+						type: 'image_url',
+						image_url: { url, detail: options.detail ?? 'auto' },
+					})),
+				],
+			},
+		],
+		...(options.maxTokens ? { max_tokens: options.maxTokens } : {}),
+	};
+	return requestOptions;
+}
+
+async function simplifyAnalyzeOutput(
+	this: IExecuteSingleFunctions,
+	items: INodeExecutionData[],
+): Promise<INodeExecutionData[]> {
+	if (this.getNodeParameter('simplifyOutput', true) === false) {
+		return items;
+	}
+	return items.map((item) => {
+		const choices = (item.json.choices ?? []) as Array<{ message?: { content?: string } }>;
+		return { json: { content: choices[0]?.message?.content ?? '' } };
+	});
+}
+
+const show = { resource: ['image'], operation: ['analyze'] };
+
+const analyzeOperations: INodeProperties[] = [
+	{
+		displayName: 'Model',
+		name: 'analyzeModel',
+		type: 'options',
+		required: true,
+		default: '',
+		description: 'A model that can read images (vision model), e.g. GPT-4o, Claude or Gemini',
+		typeOptions: {
+			loadOptions: {
+				routing: {
+					request: {
+						method: 'GET',
+						url: '/models',
+					},
+					output: {
+						postReceive: [
+							{ type: 'rootProperty', properties: { property: 'data' } },
+							{
+								type: 'setKeyValue',
+								properties: {
+									name: '={{$responseItem.id}}',
+									value: '={{$responseItem.id}}',
+								},
+							},
+							{ type: 'sort', properties: { key: 'name' } },
+						],
+					},
+				},
+			},
+		},
+		displayOptions: { show },
+	},
+	{
+		displayName: 'Instruction / Text',
+		name: 'text',
+		type: 'string',
+		placeholder: 'e.g. Summarize this email and its attachments: {{ $json.text }}',
+		description:
+			'What you want the model to do with the images, plus any text to include (e.g. an email body)',
+		default: "What's in this image?",
+		typeOptions: { rows: 4 },
+		displayOptions: { show },
+	},
+	{
+		displayName: 'Images to Send',
+		name: 'inputType',
+		type: 'options',
+		default: 'url',
+		description: 'Where the images come from',
+		options: [
+			{
+				name: 'All Images From Previous Node',
+				value: 'allBinary',
+				description:
+					'Every image file of the incoming item, e.g. all email attachments (PDFs and other files are ignored)',
+			},
+			{
+				name: 'Specific Files',
+				value: 'binary',
+				description: 'Only the files whose field names you list',
+			},
+			{
+				name: 'Image URLs',
+				value: 'url',
+				description: 'Public links to images',
+			},
+			{
+				name: 'No Image (Text Only)',
+				value: 'none',
+				description: 'Send only the text',
+			},
+		],
+		displayOptions: { show },
+	},
+	{
+		displayName: 'Image URL(s)',
+		name: 'imageUrls',
+		type: 'string',
+		placeholder: 'e.g. https://example.com/image.jpeg, https://example.com/photo.png',
+		description: 'Public link(s) to the image(s), separate multiple URLs with commas',
+		default: '',
+		displayOptions: { show: { ...show, inputType: ['url'] } },
+	},
+	{
+		displayName: 'File Field Name(s)',
+		name: 'binaryPropertyName',
+		type: 'string',
+		default: 'data',
+		placeholder: 'e.g. attachment_0, attachment_1',
+		hint: 'Shown in the "Binary" tab of the previous node output',
+		description: 'Name of the binary field(s) which contain the image(s), separate multiple field names with commas',
+		displayOptions: { show: { ...show, inputType: ['binary'] } },
+	},
+	{
+		displayName: 'Return Only the Answer',
+		name: 'simplifyOutput',
+		type: 'boolean',
+		default: true,
+		description:
+			'Whether to return only the answer (in a "content" field) instead of the full API response',
+		displayOptions: { show },
+	},
+	{
+		displayName: 'Options',
+		name: 'analyzeOptions',
+		placeholder: 'Add option',
+		type: 'collection',
+		default: {},
+		displayOptions: { show },
+		options: [
+			{
+				displayName: 'Image Detail Level',
+				name: 'detail',
+				type: 'options',
+				default: 'auto',
+				description: 'How closely the model looks at the images. Higher detail costs more tokens.',
+				options: [
+					{ name: 'Auto', value: 'auto', description: 'Let the model decide' },
+					{
+						name: 'Low (Cheaper)',
+						value: 'low',
+						description: 'Good for general content; recommended with many images',
+					},
+					{
+						name: 'High (Precise)',
+						value: 'high',
+						description: 'Needed to read small text, tables or invoices',
+					},
+				],
+			},
+			{
+				displayName: 'Maximum Answer Length (Tokens)',
+				name: 'maxTokens',
+				type: 'number',
+				default: 300,
+				description:
+					'Maximum length of the answer, in tokens (1 token ≈ 4 characters). Increase it for long summaries.',
+				typeOptions: { minValue: 1 },
+			},
+			{
+				displayName: 'Model Instructions (System Message)',
+				name: 'systemMessage',
+				type: 'string',
+				default: '',
+				description: 'General behavior for the model: role, tone, language, output format',
+				placeholder: 'e.g. You are a support assistant. Answer in French.',
+				typeOptions: { rows: 3 },
+			},
+		],
+	},
+];
+
 export const imageFields: INodeProperties[] = [
 	/* -------------------------------------------------------------------------- */
 	/*                                image:create                                */
 	/* -------------------------------------------------------------------------- */
 	...createOperations,
+
+	/* -------------------------------------------------------------------------- */
+	/*                                image:analyze                               */
+	/* -------------------------------------------------------------------------- */
+	...analyzeOperations,
 ];

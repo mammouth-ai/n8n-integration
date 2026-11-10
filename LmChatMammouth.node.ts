@@ -27,7 +27,7 @@ export class LmChatMammouth implements INodeType {
 		icon: { light: 'file:icons/mammouth.svg', dark: 'file:icons/mammouth.dark.svg' },
 		group: ['transform'],
 		version: 1,
-		description: 'Chat model from the Mammouth API, for use with AI Agents and Chains',
+		description: 'Mammouth AI chat model (https://mammouth.ai) for AI Agents and Chains',
 		defaults: {
 			name: 'Mammouth Chat Model',
 		},
@@ -72,34 +72,40 @@ export class LmChatMammouth implements INodeType {
 				default: {},
 				options: [
 					{
-						displayName: 'Frequency Penalty',
+						displayName: 'Avoid Repetition (Frequency Penalty)',
 						name: 'frequencyPenalty',
 						default: 0,
 						typeOptions: { maxValue: 2, minValue: -2, numberPrecision: 1 },
+						description:
+							'From -2 to 2. Higher values make the model less likely to repeat the same words and sentences.',
 						type: 'number',
 					},
 					{
-						displayName: 'Maximum Number of Tokens',
+						displayName: 'Maximum Response Length (Tokens)',
 						name: 'maxTokens',
 						default: -1,
-						description: 'The maximum number of tokens to generate. -1 lets the API decide.',
+						description:
+							'Maximum length of the reply, in tokens (1 token ≈ 4 characters). -1 lets the API decide.',
 						type: 'number',
 					},
 					{
-						displayName: 'Max Retries',
+						displayName: 'Retries on Failure',
 						name: 'maxRetries',
 						default: 2,
+						description: 'How many times to retry the request if the API fails',
 						type: 'number',
 					},
 					{
-						displayName: 'Presence Penalty',
+						displayName: 'Encourage New Topics (Presence Penalty)',
 						name: 'presencePenalty',
 						default: 0,
 						typeOptions: { maxValue: 2, minValue: -2, numberPrecision: 1 },
+						description:
+							'From -2 to 2. Higher values push the model to talk about new subjects instead of staying on the same ones.',
 						type: 'number',
 					},
 					{
-						displayName: 'Response Format',
+						displayName: 'Output Format',
 						name: 'responseFormat',
 						default: 'text',
 						type: 'options',
@@ -113,24 +119,28 @@ export class LmChatMammouth implements INodeType {
 						],
 					},
 					{
-						displayName: 'Sampling Temperature',
+						displayName: 'Creativity (Temperature)',
 						name: 'temperature',
 						default: 0.7,
 						typeOptions: { maxValue: 2, minValue: 0, numberPrecision: 1 },
+						description:
+							'From 0 to 2. Low values give focused, predictable answers; high values give more varied, creative answers.',
 						type: 'number',
 					},
 					{
-						displayName: 'Timeout',
+						displayName: 'Timeout (Ms)',
 						name: 'timeout',
 						default: 60000,
-						description: 'Maximum request time in milliseconds',
+						description: 'Maximum time to wait for the reply, in milliseconds (60000 = 1 minute)',
 						type: 'number',
 					},
 					{
-						displayName: 'Top P',
+						displayName: 'Word Choice Diversity (Top P)',
 						name: 'topP',
 						default: 1,
 						typeOptions: { maxValue: 1, minValue: 0, numberPrecision: 1 },
+						description:
+							'From 0 to 1. Lower values restrict the model to its most likely words. Change this or Creativity, not both.',
 						type: 'number',
 					},
 				],

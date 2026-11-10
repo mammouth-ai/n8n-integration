@@ -15,10 +15,11 @@ export const chatOperations: INodeProperties[] = [
 		},
 		options: [
 			{
-				name: 'Complete',
+				name: 'Send Message',
 				value: 'complete',
-				action: 'Create a Completion',
-				description: 'Create one or more completions for a given text',
+				action: 'Send a message to a model',
+				description:
+					'Send one or more messages to an AI model and get its reply. Use this to generate any kind of text.',
 				routing: {
 					request: {
 						method: 'POST',
@@ -146,9 +147,12 @@ const completeOperations: INodeProperties[] = [
 		default: '',
 	},
 	{
-		displayName: 'Prompt',
+		displayName: 'Messages',
 		name: 'prompt',
 		type: 'fixedCollection',
+		description:
+			'The conversation sent to the model, in order. Usually: one "Instructions" message (optional) then one "User" message with your request.',
+		hint: 'Example: Instructions = "You are a support agent, answer in French" / User = "Reply to this email: {{ $json.text }}"',
 		typeOptions: {
 			sortable: true,
 			multipleValues: true,
@@ -163,34 +167,40 @@ const completeOperations: INodeProperties[] = [
 		default: {},
 		options: [
 			{
-				displayName: 'Messages',
+				displayName: 'Message',
 				name: 'messages',
 				values: [
 					{
-						displayName: 'Role',
+						displayName: 'From',
 						name: 'role',
 						type: 'options',
 						options: [
 							{
-								name: 'Assistant',
+								name: 'AI (Assistant)',
 								value: 'assistant',
+								description: 'A previous reply from the model',
 							},
 							{
-								name: 'System',
+								name: 'Instructions (System)',
 								value: 'system',
+								description: 'Tells the model how to behave (tone, language, role…)',
 							},
 							{
 								name: 'User',
 								value: 'user',
+								description: 'A message or question from the user',
 							},
 						],
 						default: 'user',
 					},
 					{
-						displayName: 'Content',
+						displayName: 'Text',
 						name: 'content',
+						placeholder: 'e.g. Write a polite reply to this email: {{ $json.text }}',
+						description: 'Content of the message. You can use expressions to insert data from previous nodes.',
 						type: 'string',
 						default: '',
+						typeOptions: { rows: 2 },
 					},
 				],
 			},
@@ -207,7 +217,7 @@ const completeOperations: INodeProperties[] = [
 
 const sharedOperations: INodeProperties[] = [
 	{
-		displayName: 'Simplify',
+		displayName: 'Return Only the Reply',
 		name: 'simplifyOutput',
 		type: 'boolean',
 		default: true,
@@ -250,7 +260,7 @@ const sharedOperations: INodeProperties[] = [
 				],
 			},
 		},
-		description: 'Whether to return a simplified version of the response instead of the raw data',
+		description: 'Whether to return only the model reply instead of the full API response',
 	},
 
 	{
@@ -268,10 +278,10 @@ const sharedOperations: INodeProperties[] = [
 		},
 		options: [
 			{
-				displayName: 'Echo Prompt',
+				displayName: 'Include Prompt in Output',
 				name: 'echo',
 				type: 'boolean',
-				description: 'Whether the prompt should be echo back in addition to the completion',
+				description: 'Whether to repeat the prompt before the generated text',
 				default: false,
 				displayOptions: {
 					show: {
@@ -286,12 +296,12 @@ const sharedOperations: INodeProperties[] = [
 				},
 			},
 			{
-				displayName: 'Frequency Penalty',
+				displayName: 'Avoid Repetition (Frequency Penalty)',
 				name: 'frequency_penalty',
 				default: 0,
 				typeOptions: { maxValue: 2, minValue: -2, numberPrecision: 1 },
 				description:
-					"Positive values penalize new tokens based on their existing frequency in the text so far, decreasing the model's likelihood to repeat the same line verbatim",
+					'From -2 to 2. Higher values make the model less likely to repeat the same words and sentences.',
 				type: 'number',
 				routing: {
 					send: {
@@ -301,11 +311,11 @@ const sharedOperations: INodeProperties[] = [
 				},
 			},
 			{
-				displayName: 'Maximum Number of Tokens',
+				displayName: 'Maximum Response Length (Tokens)',
 				name: 'maxTokens',
 				default: 16,
 				description:
-					'The maximum number of tokens to generate in the completion. Most models have a context length of 2048 tokens (except for the newest models, which support 32,768).',
+					'Maximum length of the reply, in tokens (1 token ≈ 4 characters). Too low a value cuts the reply short.',
 				type: 'number',
 				displayOptions: {
 					show: {
@@ -323,11 +333,11 @@ const sharedOperations: INodeProperties[] = [
 				},
 			},
 			{
-				displayName: 'Number of Completions',
+				displayName: 'Number of Replies',
 				name: 'n',
 				default: 1,
 				description:
-					'How many completions to generate for each prompt. Note: Because this parameter generates many completions, it can quickly consume your token quota. Use carefully and ensure that you have reasonable settings for max_tokens and stop.',
+					'How many alternative replies to generate. Each reply consumes tokens, so higher values cost more.',
 				type: 'number',
 				routing: {
 					send: {
@@ -337,12 +347,12 @@ const sharedOperations: INodeProperties[] = [
 				},
 			},
 			{
-				displayName: 'Presence Penalty',
+				displayName: 'Encourage New Topics (Presence Penalty)',
 				name: 'presence_penalty',
 				default: 0,
 				typeOptions: { maxValue: 2, minValue: -2, numberPrecision: 1 },
 				description:
-					"Positive values penalize new tokens based on whether they appear in the text so far, increasing the model's likelihood to talk about new topics",
+					'From -2 to 2. Higher values push the model to talk about new subjects instead of staying on the same ones.',
 				type: 'number',
 				routing: {
 					send: {
@@ -352,12 +362,12 @@ const sharedOperations: INodeProperties[] = [
 				},
 			},
 			{
-				displayName: 'Sampling Temperature',
+				displayName: 'Creativity (Temperature)',
 				name: 'temperature',
 				default: 1,
 				typeOptions: { maxValue: 1, minValue: 0, numberPrecision: 1 },
 				description:
-					'Controls randomness: Lowering results in less random completions. As the temperature approaches zero, the model will become deterministic and repetitive.',
+					'From 0 to 1. Low values give focused, predictable answers; high values give more varied, creative answers.',
 				type: 'number',
 				routing: {
 					send: {
@@ -367,12 +377,12 @@ const sharedOperations: INodeProperties[] = [
 				},
 			},
 			{
-				displayName: 'Top P',
+				displayName: 'Word Choice Diversity (Top P)',
 				name: 'topP',
 				default: 1,
 				typeOptions: { maxValue: 1, minValue: 0, numberPrecision: 1 },
 				description:
-					'Controls diversity via nucleus sampling: 0.5 means half of all likelihood-weighted options are considered. We generally recommend altering this or temperature but not both.',
+					'From 0 to 1. Lower values restrict the model to its most likely words. Change this or Creativity, not both.',
 				type: 'number',
 				routing: {
 					send: {

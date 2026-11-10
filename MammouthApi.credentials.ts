@@ -10,6 +10,7 @@ export class MammouthApi implements ICredentialType {
 	name = 'mammouthApi';
 	displayName = 'Mammouth API';
 	icon: Icon = { light: 'file:icons/mammouth.svg', dark: 'file:icons/mammouth.dark.svg' };
+	documentationUrl = 'https://mammouth.ai';
 
 	properties: INodeProperties[] = [
 		{
@@ -28,6 +29,8 @@ export class MammouthApi implements ICredentialType {
 			typeOptions: { password: true },
 			required: true,
 			default: '',
+			description:
+				'Your Mammouth API key, available in your account on <a href="https://mammouth.ai" target="_blank">mammouth.ai</a>',
 		},
 	];
 
