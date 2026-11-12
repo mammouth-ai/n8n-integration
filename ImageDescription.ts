@@ -21,7 +21,7 @@ export const imageOperations: INodeProperties[] = [
 		},
 		options: [
 			{
-				name: 'Generate Image',
+				name: 'Generate',
 				value: 'create',
 				action: 'Generate an image',
 				description:
@@ -45,7 +45,7 @@ export const imageOperations: INodeProperties[] = [
 				},
 			},
 			{
-				name: 'Analyze Images',
+				name: 'Analyze',
 				value: 'analyze',
 				action: 'Analyze images with text',
 				description:

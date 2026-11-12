@@ -15,7 +15,7 @@ export const textOperations: INodeProperties[] = [
 		},
 		options: [
 			{
-				name: 'Continue Text',
+				name: 'Continue',
 				value: 'complete',
 				action: 'Continue a text',
 				description:
@@ -29,7 +29,7 @@ export const textOperations: INodeProperties[] = [
 				},
 			},
 			{
-				name: 'Edit Text',
+				name: 'Edit',
 				value: 'edit',
 				action: 'Edit a text',
 				description:

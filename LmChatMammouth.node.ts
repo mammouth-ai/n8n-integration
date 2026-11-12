@@ -1,4 +1,4 @@
-import { ChatOpenAI, type ChatOpenAIFields } from '@langchain/openai';
+import { supplyModel } from '@n8n/ai-node-sdk';
 import {
 	NodeConnectionTypes,
 	type ILoadOptionsFunctions,
@@ -174,18 +174,17 @@ export class LmChatMammouth implements INodeType {
 			{},
 		) as ModelOptions;
 
-		const fields: ChatOpenAIFields = {
+		return supplyModel(this, {
+			type: 'openai',
+			baseUrl: credentials.url.trim().replace(/[/]+$/, ''),
 			apiKey: credentials.apiKey,
 			model,
 			...options,
 			maxTokens: maxTokens === -1 ? undefined : maxTokens,
 			maxRetries: maxRetries ?? 2,
-			configuration: {
-				baseURL: credentials.url.trim().replace(/[/]+$/, ''),
-			},
-			modelKwargs: responseFormat ? { response_format: { type: responseFormat } } : undefined,
-		};
-
-		return { response: new ChatOpenAI(fields) };
+			additionalParams: responseFormat
+				? { response_format: { type: responseFormat } }
+				: undefined,
+		});
 	}
 }
