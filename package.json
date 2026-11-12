@@ -3,6 +3,14 @@
   "version": "0.2.1",
   "description": "Mammouth API node for n8n",
   "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/mammouth-ai/n8n-integration.git"
+  },
+  "publishConfig": {
+    "access": "public",
+    "provenance": true
+  },
   "keywords": [
     "n8n-community-node-package"
   ],
