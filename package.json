@@ -1,6 +1,6 @@
 {
   "name": "n8n-nodes-mammouth",
-  "version": "0.2.0",
+  "version": "0.2.1",
   "description": "Mammouth API node for n8n",
   "license": "MIT",
   "keywords": [
