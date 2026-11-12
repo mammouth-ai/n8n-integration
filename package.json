@@ -1,8 +1,13 @@
 {
   "name": "n8n-nodes-mammouth",
-  "version": "0.2.1",
+  "version": "0.2.2",
   "description": "Mammouth API node for n8n",
   "license": "MIT",
+  "author": {
+    "name": "Mammouth AI",
+    "email": "mathieu@mammouth.ai"
+  },
+  "homepage": "https://github.com/mammouth-ai/n8n-integration",
   "repository": {
     "type": "git",
     "url": "git+https://github.com/mammouth-ai/n8n-integration.git"
