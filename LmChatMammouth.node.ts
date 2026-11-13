@@ -47,10 +47,6 @@ export class LmChatMammouth implements INodeType {
 				required: true,
 			},
 		],
-		requestDefaults: {
-			ignoreHttpStatusErrors: true,
-			baseURL: '={{ $credentials.url.trim().replace(/[/]+$/, "") }}',
-		},
 		properties: [
 			{
 				displayName: 'Model',
