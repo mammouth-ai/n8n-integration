@@ -1,46 +1,45 @@
-# Mammouth pour n8n
+# Mammouth for n8n
 
 <a href="https://mammouth.ai/">
-  <img src="https://mammouth.ai/logos/mammouth-ai-logo.png" alt="Mammouth AI — site officiel" width="200">
+  <img src="https://mammouth.ai/logos/mammouth-ai-logo.png" alt="Mammouth AI — official website" width="200">
 </a>
 
-**[Découvrir Mammouth AI](https://mammouth.ai/)**
+**[Discover Mammouth AI](https://mammouth.ai/)**
 
-Nodes communautaires pour utiliser [Mammouth AI](https://mammouth.ai/) (ou toute API
-compatible avec le protocole OpenAI) dans n8n. Le package contient deux nodes :
+Community nodes for using [Mammouth AI](https://mammouth.ai/) (or any API
+compatible with the OpenAI protocol) in n8n. The package contains two nodes:
 
-- **Mammouth** : node d'action (Chat, Image, Text) à placer dans un workflow.
-- **Mammouth Chat Model** : sous-node « Chat Model » à brancher sur un **AI Agent**
-  ou une **Chain** n8n.
+- **Mammouth**: an action node (Chat, Image, Text) to add to a workflow.
+- **Mammouth Chat Model**: a **Chat Model** sub-node to connect to an **AI Agent**
+  or an n8n **Chain**.
 
-Open Source : https://github.com/mammouth-ai/n8n-integration
+Open source: https://github.com/mammouth-ai/n8n-integration
 
-## Installation du package publié
+## Install the published package
 
-Le package npm est disponible sous le nom
+The npm package is available as
 [`n8n-nodes-mammouth`](https://www.npmjs.com/package/n8n-nodes-mammouth).
 
-Sur une instance n8n auto-hébergée autorisant les nodes communautaires :
+On a self-hosted n8n instance that allows community nodes:
 
-1. Ouvrir **Settings → Community Nodes → Install**.
-2. Saisir `n8n-nodes-mammouth` et confirmer l'installation.
-3. Créer les credentials **Mammouth API** décrits ci-dessous.
-4. Ajouter le node **Mammouth** à un workflow.
+1. Open **Settings → Community Nodes → Install**.
+2. Enter `n8n-nodes-mammouth` and confirm the installation.
+3. Create the **Mammouth API** credentials described below.
+4. Add the **Mammouth** node to a workflow.
 
-La compilation depuis les sources ci-dessous est une alternative pour le
-développement ou le chargement comme extension personnalisée.
+Building from source, as described below, is an alternative for development or
+loading the node as a custom extension.
 
-## Compilation et vérification
+## Build and verify
 
-Node.js 24 ou supérieur et npm sont nécessaires (une dépendance du SDK n8n
-exige Node.js 24). Respecter également la version
-Node.js requise par votre installation n8n. Le paquet est compilé et testé avec
-`n8n-workflow` 2.42.1 ; la compatibilité avec votre version exacte de n8n reste
-à vérifier sur votre instance.
+Node.js 24 or later and npm are required (a dependency of the n8n SDK requires
+Node.js 24). Also use a Node.js version supported by your n8n installation.
+The package is built and tested with `n8n-workflow` 2.42.1; compatibility with
+your exact n8n version should be verified on your instance.
 
-Les exemples supposent que le projet se trouve dans `$HOME/n8n-integration`.
-`$HOME` désigne le répertoire personnel de l'utilisateur courant ; adapter le
-chemin à l'emplacement de votre copie du projet.
+The examples assume the project is located at `$HOME/n8n-integration`.
+`$HOME` refers to the current user's home directory; adjust the path to the
+location of your project copy.
 
 ```bash
 cd "$HOME/n8n-integration"
@@ -48,203 +47,204 @@ npm ci
 npm test
 ```
 
-La compilation produit `$HOME/n8n-integration/dist`,
-avec le node, ses credentials, ses icônes et ses métadonnées.
+The build outputs the node, its credentials, icons, and metadata to
+`$HOME/n8n-integration/dist`.
 
-## Chargement dans n8n installé avec npm / Node.js
+## Load in an npm / Node.js installation of n8n
 
-Sur la machine qui exécute n8n, après compilation, définir le répertoire
-d'extensions personnalisées au démarrage :
+On the machine running n8n, after building, set the custom extensions directory
+at startup:
 
 ```bash
 export N8N_CUSTOM_EXTENSIONS="$HOME/n8n-integration/dist"
 n8n start
 ```
 
-Arrêter préalablement l'instance existante : ne pas lancer un deuxième processus
-sur le même port. Si n8n est géré par systemd ou PM2, ajouter cette variable à
-la configuration de ce service, puis le redémarrer avec son gestionnaire.
-Un simple `export` dans un terminal ne modifie pas l'environnement d'un service.
+Stop any existing instance first; do not start a second process on the same
+port. If n8n is managed by systemd or PM2, add this variable to that service's
+configuration and restart it with its service manager. A simple `export` in a
+terminal does not change a service's environment.
 
-- Exécuter n8n avec son utilisateur habituel pour conserver ses données.
-- Le chemin ci-dessus est un exemple : l'adapter si n8n tourne ailleurs.
-- Dans la configuration d'un service, utiliser le chemin absolu réel si `$HOME`
-  n'est pas développé par le gestionnaire de services.
-- Conserver les dépendances installées dans ce projet et rendre le projet lisible
-  par l'utilisateur du service n8n.
-- Si `N8N_CUSTOM_EXTENSIONS` contient déjà des chemins, ajouter ce répertoire en
-  les séparant par `;`, sans supprimer les extensions existantes.
-- Recompiler puis redémarrer n8n après chaque modification.
-- Recharger l'interface et chercher **Mammouth** dans le sélecteur de nodes.
+- Run n8n as its usual user to preserve access to its data.
+- The path above is an example; adjust it if n8n runs elsewhere.
+- In a service configuration, use the actual absolute path if the service
+  manager does not expand `$HOME`.
+- Keep this project's dependencies installed and make the project readable by
+  the n8n service user.
+- If `N8N_CUSTOM_EXTENSIONS` already contains paths, append this directory,
+  separating paths with `;`, without removing existing extensions.
+- Rebuild and restart n8n after every change.
+- Reload the UI and search for **Mammouth** in the node selector.
 
-Le chargement comme extension personnalisée ne nécessite pas de publication npm.
-`npm pack` produit aussi une archive installable pour un déploiement en paquet
-communautaire. Ne pas charger simultanément le même node comme extension
-personnalisée et comme paquet communautaire ; leurs identifiants de workflow
-diffèrent (`CUSTOM.mammouth` et `n8n-nodes-mammouth.mammouth`).
+Loading as a custom extension does not require publishing to npm. `npm pack`
+also creates an installable archive for deployment as a community package. Do
+not load the same node simultaneously as a custom extension and a community
+package; their workflow identifiers differ (`CUSTOM.mammouth` and
+`n8n-nodes-mammouth.mammouth`).
 
-## Configuration de l'API
+## API credentials
 
-Créer des credentials **Mammouth API** et renseigner :
+Create **Mammouth API** credentials and provide:
 
-- **API Base URL** : `https://api.mammouth.ai/v1` pour l'API Mammouth officielle.
-  Pour une API compatible OpenAI hébergée ailleurs, saisir son URL de base
-  complète, avec son préfixe de version si nécessaire.
-- **API Key** : clé envoyée dans `Authorization: Bearer …`, disponible dans votre
-  compte Mammouth, dans les paramètres de l'API sur
-  [mammouth.ai](https://mammouth.ai/). La clé est stockée dans les credentials
-  n8n et ne doit pas être écrite dans un champ du workflow.
+- **API Base URL**: `https://api.mammouth.ai/v1` for the official Mammouth API.
+  For an OpenAI-compatible API hosted elsewhere, enter its complete base URL,
+  including its version prefix if required.
+- **API Key**: the key sent in `Authorization: Bearer …`. Find it in your
+  Mammouth account's API settings on [mammouth.ai](https://mammouth.ai/). The
+  key is stored in n8n credentials and should not be written into a workflow
+  field.
 
-Le bouton de test des credentials appelle
-`GET https://api.mammouth.ai/v1/models` pour vérifier la clé et l'accès à l'API.
+The credential test button calls
+`GET https://api.mammouth.ai/v1/models` to verify the key and API access.
 
-## Exemple : node Mammouth (réponse à un message)
+## Example: Mammouth node (reply to a message)
 
-1. Ajoutez un node **Edit Fields** et créez ces champs :
+1. Add an **Edit Fields** node and create these fields:
 
    ```json
    {
      "name": "Camille",
-     "message": "Est-ce que je peux déplacer mon rendez-vous à vendredi ?"
+     "message": "Can I move my appointment to Friday?"
    }
    ```
 
-2. Reliez-le à un node **Mammouth**, puis choisissez **Chat → Send Message**.
-3. Sélectionnez les credentials **Mammouth API** ci-dessus et un modèle proposé
-   par la liste de modèles.
-4. Ajoutez deux messages :
-   - **Instructions (System)** : `Tu es un assistant de support. Réponds en français et reste concis.`
-   - **User** : `Réponds à {{ $json.name }} : {{ $json.message }}`
-5. Exécutez le workflow. Avec **Return Only the Reply** activé, la réponse est
-   accessible dans `message.content` de la sortie du node.
+2. Connect it to a **Mammouth** node, then choose **Chat → Send Message**.
+3. Select the **Mammouth API** credentials above and a model from the list of
+   available models.
+4. Add two messages:
+   - **Instructions (System)**: `You are a support assistant. Be concise.`
+   - **User**: `Reply to {{ $json.name }}: {{ $json.message }}`
+5. Run the workflow. With **Return Only the Reply** enabled, the response is
+   available in `message.content` in the node output.
 
-## Exemple : node Mammouth Chat Model avec un AI Agent
+## Example: Mammouth Chat Model with an AI Agent
 
-1. Ajoutez un **Chat Trigger** et reliez-le à l'entrée principale d'un **AI Agent**.
-2. Ajoutez un **Mammouth Chat Model**, sélectionnez les mêmes credentials
-   **Mammouth API**, puis choisissez un modèle disponible.
-3. Reliez la sortie **Model** du sous-node à l'entrée **Chat Model** de l'AI Agent.
-4. Dans l'AI Agent, utilisez `{{ $json.chatInput }}` comme prompt utilisateur.
-   Dans le Chat Trigger, envoyez par exemple : « Donne-moi trois idées de repas
-   végétariens rapides. »
-5. Lancez le workflow et consultez la réponse de l'AI Agent. Le Mammouth Chat
-   Model fournit le modèle de langage à l'agent; il ne se relie pas à la sortie
-   principale du workflow.
+1. Add a **Chat Trigger** and connect it to the main input of an **AI Agent**.
+2. Add a **Mammouth Chat Model**, select the same **Mammouth API** credentials,
+   and choose an available model.
+3. Connect the sub-node's **Model** output to the AI Agent's **Chat Model**
+   input.
+4. In the AI Agent, use `{{ $json.chatInput }}` as the user prompt. In the Chat
+   Trigger, try: “Give me three ideas for quick vegetarian meals.”
+5. Run the workflow and check the AI Agent's response. Mammouth Chat Model
+   provides the agent's language model; it does not connect to the workflow's
+   main output.
 
-## Quelle opération choisir ?
+## Which operation should I choose?
 
-| Je veux… | Ressource → Opération |
+| I want to… | Resource → Operation |
 | --- | --- |
-| Générer un texte (email, résumé, traduction, réponse client, extraction de données…) | **Chat → Send Message** |
-| Analyser un email avec toutes ses images jointes | **Image → Analyze** |
-| Décrire, lire ou comparer une ou plusieurs images | **Image → Analyze** |
-| Créer une image à partir d'une description | **Image → Generate** |
-| Vérifier si un texte contient des propos haineux, violents, sexuels… | **Text → Check Content Safety** |
-| Corriger ou reformuler un texte selon une consigne | **Chat → Send Message** (ou **Text → Edit** si l'API le supporte) |
-| Utiliser Mammouth comme cerveau d'un AI Agent | node **Mammouth Chat Model** |
+| Generate text (an email, summary, translation, customer reply, data extraction…) | **Chat → Send Message** |
+| Analyze an email with all its attached images | **Image → Analyze** |
+| Describe, read, or compare one or more images | **Image → Analyze** |
+| Create an image from a description | **Image → Generate** |
+| Check whether text contains hateful, violent, sexual, or other unsafe content | **Text → Check Content Safety** |
+| Correct or rephrase text based on an instruction | **Chat → Send Message** (or **Text → Edit** if the API supports it) |
+| Use Mammouth as the brain of an AI Agent | **Mammouth Chat Model** node |
 
-**En cas de doute, utiliser Chat → Send Message** : c'est l'opération la plus
-polyvalente et la mieux supportée.
+**If in doubt, use Chat → Send Message**: it is the most versatile and best
+supported operation.
 
 ### Chat → Send Message
 
-Envoie une conversation à un modèle et renvoie sa réponse. Chaque message a un
-émetteur (**From**) :
+Sends a conversation to a model and returns its response. Each message has a
+sender (**From**):
 
-- **Instructions (System)** : consigne générale (rôle, ton, langue, format).
-  Exemple : « Tu es un agent du support client, réponds en français, en 5 lignes maximum. »
-- **User** : la demande. Exemple : `Réponds à cet email : {{ $json.text }}`.
-- **AI (Assistant)** : une réponse précédente du modèle, pour reprendre une conversation.
+- **Instructions (System)**: general instructions (role, tone, language,
+  format). Example: “You are a customer support agent. Be concise and use at
+  most five lines.”
+- **User**: the request. Example: `Reply to this email: {{ $json.text }}`.
+- **AI (Assistant)**: a previous model response, to continue a conversation.
 
-Penser à augmenter **Maximum Response Length** dans les options : la valeur par
-défaut (16 tokens, environ 60 caractères) coupe la plupart des réponses.
+Consider increasing **Maximum Response Length** in the options: the default
+value (16 tokens, about 60 characters) truncates most responses.
 
 ### Image → Analyze
 
-Envoie en une seule requête un texte **et plusieurs images** à un modèle capable de
-lire les images (GPT-4o, Claude, Gemini…). Cas typique : un email et ses pièces jointes.
+Sends text and multiple images in a single request to a model that can read
+images (GPT-4o, Claude, Gemini…). A typical use case is an email and its
+attachments.
 
-1. En amont, un node qui lit les emails (Gmail, IMAP…) avec le téléchargement des
-   pièces jointes activé.
-2. **Instruction / Text** : `Résume cet email et ses pièces jointes : {{ $json.text }}`.
-3. **Images to Send** :
-   - **All Images From Previous Node** : toutes les images de l'item (les PDF et
-     autres fichiers sont ignorés).
-   - **Specific Files** : seulement les champs listés (`attachment_0, attachment_1`).
-   - **Image URLs** : des liens publics, séparés par des virgules.
-   - **No Image (Text Only)** : texte seul.
-4. Options utiles : **Image Detail Level** (`Low` coûte moins cher, `High` est
-   nécessaire pour lire du petit texte ou une facture), **Maximum Answer Length**
-   (300 tokens par défaut), **Model Instructions**.
+1. Before this node, add a node that reads emails (Gmail, IMAP…) with attachment
+   downloads enabled.
+2. **Instruction / Text**: `Summarize this email and its attachments: {{ $json.text }}`.
+3. **Images to Send**:
+   - **All Images From Previous Node**: all images in the item (PDFs and other
+     files are ignored).
+   - **Specific Files**: only the listed fields (`attachment_0, attachment_1`).
+   - **Image URLs**: public links, separated by commas.
+   - **No Image (Text Only)**: text only.
+4. Useful options: **Image Detail Level** (**Low** costs less; **High** is
+   needed to read small text or an invoice), **Maximum Answer Length** (300
+   tokens by default), and **Model Instructions**.
 
-La réponse se trouve dans le champ `content`.
+The response is in the `content` field.
 
 ### Image → Generate
 
-Crée une ou plusieurs images à partir d'une description. **Return Image As** :
-**File** (prêt à joindre à un email ou à téléverser) ou **Image URL** (lien temporaire).
+Creates one or more images from a description. **Return Image As**: **File**
+(ready to attach to an email or upload) or **Image URL** (a temporary link).
 
-### Text (avancé)
+### Text (advanced)
 
-Opérations historiques, moins utiles au quotidien :
+Legacy operations that are less useful day to day:
 
-- **Continue** : le modèle *continue* le texte donné (autocomplétion). Il ne suit
-  pas d'instruction : « Cher client, suite à votre commande » fonctionne,
-  « Écris un email » beaucoup moins. Pour demander un texte, utiliser Chat.
-- **Edit** : réécrit un texte selon une consigne. Nécessite l'endpoint `/edits`,
-  rarement disponible ; Chat fait la même chose.
-- **Check Content Safety** (modération) : **ne génère pas de texte**. Indique si un
-  texte contient de la haine, du harcèlement, de la violence, du contenu sexuel ou
-  d'automutilation, catégorie par catégorie. Utile pour filtrer des messages
-  d'utilisateurs avant d'y répondre. Nécessite un modèle de modération
-  (ex. `omni-moderation-latest`), pas un modèle de chat.
+- **Continue**: the model *continues* the supplied text (autocomplete). It does
+  not follow instructions: “Dear customer, regarding your order” works, while
+  “Write an email” does not. Use Chat to request generated text.
+- **Edit**: rewrites text based on an instruction. Requires the `/edits`
+  endpoint, which is rarely available; Chat does the same thing.
+- **Check Content Safety** (moderation): **does not generate text**. It reports
+  whether text contains hate, harassment, violence, sexual content, or
+  self-harm, by category. Useful for filtering user messages before replying.
+  Requires a moderation model (e.g. `omni-moderation-latest`), not a chat model.
 
-### Options communes (Chat et Text)
+### Common options (Chat and Text)
 
-| Option | Effet |
+| Option | Effect |
 | --- | --- |
-| Creativity (Temperature) | Bas = réponses précises et constantes ; haut = plus variées |
-| Word Choice Diversity (Top P) | Restreint le vocabulaire aux mots les plus probables ; modifier ceci **ou** la température |
-| Avoid Repetition (Frequency Penalty) | Réduit les répétitions de mots et de phrases |
-| Encourage New Topics (Presence Penalty) | Pousse le modèle à aborder de nouveaux sujets |
-| Maximum Response Length (Tokens) | Longueur maximale de la réponse (1 token ≈ 4 caractères) |
-| Number of Replies / Results | Nombre de variantes générées (chacune consomme des tokens) |
+| Creativity (Temperature) | Lower values give more precise and consistent answers; higher values give more varied answers |
+| Word Choice Diversity (Top P) | Limits word choice to the most likely options; change this **or** temperature |
+| Avoid Repetition (Frequency Penalty) | Reduces repeated words and phrases |
+| Encourage New Topics (Presence Penalty) | Encourages the model to address new topics |
+| Maximum Response Length (Tokens) | Maximum response length (1 token ≈ 4 characters) |
+| Number of Replies / Results | Number of generated variants (each consumes tokens) |
 
-Les noms techniques des paramètres sont inchangés : les workflows existants
-continuent de fonctionner malgré les nouveaux libellés.
+The technical parameter names are unchanged, so existing workflows continue
+to work despite the updated labels.
 
-## Endpoints et limites
+## Endpoints and limitations
 
-Les chemins suivants sont ajoutés à l'URL de base :
+The following paths are appended to the base URL:
 
-| Fonction | Méthode et chemin |
+| Function | Method and path |
 | --- | --- |
-| Liste des modèles et test des credentials | `GET /models` |
-| Chat et analyse d'images | `POST /chat/completions` |
-| Génération d'image | `POST /images/generations` |
-| Complétion texte | `POST /completions` |
-| Édition texte | `POST /edits` |
-| Modération | `POST /moderations` |
+| List models and test credentials | `GET /models` |
+| Chat and image analysis | `POST /chat/completions` |
+| Image generation | `POST /images/generations` |
+| Text completion | `POST /completions` |
+| Text editing | `POST /edits` |
+| Moderation | `POST /moderations` |
 
-La liste des modèles attend `{ "data": [{ "id": "identifiant-du-modele" }] }`.
-Elle n'applique aucun filtre de marque : choisir un modèle compatible avec
-l'opération. L'édition et la modération demandent un identifiant saisi manuellement.
+The model list expects `{ "data": [{ "id": "model-id" }] }`. It does not filter
+by brand; choose a model compatible with the operation. Editing and moderation
+require a manually entered model ID.
 
-Les opérations et options sont héritées du node d'origine. Une compatibilité
-Chat Completions ne garantit pas les endpoints historiques d'édition, de texte,
-de modération, ni les paramètres image. Les options spécifiques DALL-E restent
-conditionnées à ces modèles. Seules les fonctions effectivement exposées par
-votre API pourront fonctionner ; aucun support supplémentaire n'est présumé.
+Operations and options are inherited from the original node. Chat Completions
+compatibility does not guarantee support for the legacy editing, text, or
+moderation endpoints, or for image parameters. DALL-E-specific options depend
+on the models in use. Only features actually exposed by your API will work; no
+additional support is implied.
 
-Les tests vérifient la compilation, les exports, les assets, les expressions n8n,
-l'authentification, les modèles et les erreurs HTTP. Un serveur HTTP local simule
-les endpoints modèles et chat à partir de la configuration du node ; ce test
-ne remplace pas une exécution du moteur de routage n8n ni un appel à votre API.
+Tests verify the build, exports, assets, n8n expressions, authentication,
+models, and HTTP errors. A local HTTP server simulates the model and chat
+endpoints using the node's configuration; this test does not replace running
+the n8n routing engine or calling your API.
 
-## Licence et marques
+## License and trademarks
 
-Le package déclare la licence MIT. Vérifier également les obligations de licence
-et d'attribution du code amont avant toute redistribution.
+The package is published under the MIT license. Also verify the licensing and
+attribution requirements for upstream code before redistribution.
 
-Le nom et le logo Mammouth appartiennent à leurs titulaires respectifs. Le lien
-vers le site officiel ne constitue pas une certification de cette intégration.
+The Mammouth name and logo belong to their respective owners. A link to the
+official website does not imply certification of this integration.
